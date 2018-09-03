@@ -20,6 +20,14 @@ module.exports = function(app) {
     });
   });
 
+  app.get("/post", function(req, res) {
+    db.Example.findAll({}).then(function() {
+      res.render("post", {
+        msg: "Create a new post!"
+      });
+    });
+  });
+
   // Load example page and pass in an example by id
   app.get("/example/:id", function(req, res) {
     db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
