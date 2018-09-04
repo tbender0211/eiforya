@@ -1,19 +1,21 @@
 var db = require("../models");
-var express = require("express");
-var router = express.Router();
 var path = __dirname + "/views/";
 
 module.exports = function(app) {
+  
+  const express = require("express");
+  const app = express.Router();
+  
   // Routes for menu
-  router.get("/", function(req, res) {
+  app.get("/", function(req, res) {
     res.sendFile(path + "index");
   });
 
-  router.get("/favorites", function(req, res) {
+  app.get("/favorites", function(req, res) {
     res.sendFile(path + "favorites");
   });
 
-  router.get("/post", function(req, res) {
+  app.get("/post", function(req, res) {
     res.sendFile(path + "post");
   });
 
@@ -24,8 +26,15 @@ module.exports = function(app) {
         msg: "Welcome!",
         examples: dbExamples
       });
+
+app.get("/", function(req, res) {
+  db.Example.findAll({}).then(function(dbExamples) {
+    res.render("index", {
+      msg: "Welcome!",
+      examples: dbExamples
     });
   });
+});
 
   app.get("/favorites", function(req, res) {
     db.Example.findAll({}).then(function(dbExamples) {
@@ -45,16 +54,12 @@ module.exports = function(app) {
   });
 
   // Load example page and pass in an example by id
-  app.get("/example/:id", function(req, res) {
-    db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
-      res.render("example", {
-        example: dbExample
-      });
+app.get("/example/", function(req, res) {
+  db.Example.findOne({ where: { id: req.params.id } }).then(function(dbExample) {
+    res.render("example", {
+      example: dbExample
     });
   });
+});
 
-  // Render 404 page for any unmatched routes
-  app.get("*", function(req, res) {
-    res.render("404");
-  });
-};
+module.exports = app;
