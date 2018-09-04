@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "Gfg020398*",
-    "database": "vytalink",
+    "password": null,
+    "database": "exampledb",
     "host": "localhost",
     "dialect": "mysql"
   },
