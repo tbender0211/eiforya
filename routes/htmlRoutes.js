@@ -1,6 +1,22 @@
 var db = require("../models");
+var express = require("express");
+var router = express.Router();
+var path = __dirname + "/views/";
 
 module.exports = function(app) {
+  // Routes for menu
+  router.get("/", function(req, res) {
+    res.sendFile(path + "index");
+  });
+
+  router.get("/favorites", function(req, res) {
+    res.sendFile(path + "favorites");
+  });
+
+  router.get("/post", function(req, res) {
+    res.sendFile(path + "post");
+  });
+
   // Load index page
   app.get("/", function(req, res) {
     db.Example.findAll({}).then(function(dbExamples) {
