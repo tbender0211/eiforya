@@ -20,7 +20,7 @@ block content
                     p Submitted by&nbsp;
                         a(href="/u/" + post.user.username)= post.user.username
                         span  in&nbsp;
-                        a(href="/r/" + post.subreddit.name) /r/#{post.subreddit.name}
+                        a(href="/r/" + post.subraddit.name) /r/#{post.subraddit.name}
                     p Score: #{post.voteScore} Upvotes: #{post.numUpvotes} Downvotes: #{post.numDownvotes}
                         form(action='/vote', method='post')
                           input(type='hidden', name='postId', value=`${post.id}`) 

@@ -8,7 +8,7 @@ mixin postList(posts)
                         p Submitted by&nbsp;
                             a(href="/u/" + post.user.username)= post.user.username
                             span  in&nbsp;
-                            a(href="/r/" + post.subreddit.name) /r/#{post.subreddit.name}
+                            a(href="/r/" + post.subraddit.name) /r/#{post.subraddit.name}
                             br
                             a(href=`/post/${post.id}`)
                              button(type="button" class="post-btn") see full post

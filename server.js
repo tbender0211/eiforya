@@ -1,153 +1,240 @@
-require("dotenv").config();
-var express = require("express");
-var bodyParser = require("body-parser");
+var express = require('express');
+var mysql = require('promise-mysql');
+
+// Express middleware
+var bodyParser = require('body-parser'); // reads request bodies from POST requests
+var cookieParser = require('cookie-parser'); // parses cookie from Cookie request header into an object
+var morgan = require('morgan'); // logs every request on the console
+var onlyLoggedIn = require('./lib/only-logged-in.js'); // only allows requests from logged in users
+var checkLoginToken = require('./lib/check-login-token.js')
+
+// Controllers
+var authController = require('./controllers/auth.js');
+
+/*
+ Database connection.
+ */
+var RadditAPI = require('./lib/raddit.js');
+if (process.env.JAWSDB_URL) {
+    var connection = mysql.createPool(process.env.JAWSDB_URL);
+  } else {
+     connection = mysql.createPool({
+        user: 'root',
+        password: 'berserkfury',
+        database: 'raddit'
+    });
+  }
+
+
+var myRaddit = new RadditAPI(connection);
+
+
+// Create a new Express web server
+var app = express();
+
+// Specify the usage of the Pug template engine
+app.set('view engine', 'pug');
+
+/*/ Set Handlebars.
 var exphbs = require("express-handlebars");
 
-var db = require("./models");
-
-var app = express();
-var PORT = process.env.PORT || 3000;
-
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
-var logger = require("morgan");
-var okta = require("@okta/okta-sdk-nodejs");
-var session = require("express-session");
-var ExpressOIDC= require("@okta/oidc-middleware").ExpressOIDC;
-var db = require("./models");
-
-var app = express();
-
-var oktaClient = new okta.Client({
-  orgUrl: process.env.ORG_URL,
-  token: process.env.USER_PROFILE_TOKEN
-});
-
-// Middleware
-var oidc = new ExpressOIDC({
-  issuer: process.env.ORG_URL_2,
-  client_id: process.env.CLIENT_ID,
-  client_secret: process.env.CLIENT_SECRET,
-  redirect_uri: process.env.HOST_URL,
-  scope: "openid profile",
-  routes: {
-    login: {
-      path: "/users/login"
-    },
-    callback: {
-      path: "/users/callback",
-      defaultRedirect: "/users/dashboard"
-    }
-  }
-});
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(express.static("public"));
-
-// Handlebars
-app.engine(
-  "handlebars",
-  exphbs({
-    defaultLayout: "main"
-  })
-);
-
-app.set("views", path.join(__dirname, "views"));
+app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
+*/
 
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// This middleware will log every request made to the web server on the console.
+app.use(morgan('dev'));
+
+// This middleware will parse the POST requests coming from an HTML form, and put the result in request.body.
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+
+// This middleware will parse the Cookie header from all requests, and put the result in request.cookies as an object.
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
-app.use(session({
-  secret: process.env.APP_SECRET,
-  resave: true,
-  saveUninitialized: false
-}));
 
-app.use(session({
-  secret: process.env.APP_SECRET,
-  resave: true,
-  saveUninitialized: false
-}));
+/*
+This custom middleware checks in the cookies if there is a SESSION token and validates it.
+*/
 
-app.use(oidc.router);
+app.use(checkLoginToken(myRaddit));
 
-app.use((req, res, next) => {
-  if (!req.userinfo) {
-    return next();
-  }
- 
-  oktaClient.getUser(req.userinfo.sub)
-    .then(user => {
-      req.user = user;
-      res.locals.user = user;
-      next();
-    }).catch(err => {
-      next(err);
-    });
+
+
+
+//Passes the auth route to the radditAPi
+app.use('/auth', authController(myRaddit));
+
+//Serve static files
+app.use('/static', express.static(__dirname + '/public'));
+
+// Regular home Page
+app.get('/', function(request, response) {
+    myRaddit.getAllPosts({})
+        .then(function(posts) {
+            response.render('homepage', {
+                posts: posts
+            });
+        })
+        .catch(function(error) {
+            response.render('error', {
+                error: error
+            });
+        });
 });
 
-// Routes
-var htmlRoutes = require("./routes/htmlRoutes");
-var usersRouter = require("./routes/userRoutes");
-
-app.use("/", htmlRoutes);
-app.use("/users", loginRequired, usersRouter);
-app.get("/logout", (req, res) => {
-  req.logout();
-  res.redirect("/");
+// Listing of subraddits
+app.get('/subraddits', function(request, response) {
+    myRaddit.getAllPosts()
+        .then(results => {
+            response.render('post-list', {
+                subraddit: results
+            })
+        })
 });
 
-//To display the user profile info
-app.get("/test", (req, res) => {
-  res.json({ profile: req.user ? req.user.profile : null });
+// Subraddit homepage, similar to the regular home page but filtered by sub.
+app.get('/r/:subraddit', function(request, response) {
+    var selectedSubraddit;
+    myRaddit.getSubradditByName(request.params.subraddit)
+        .then(result => {
+            selectedSubraddit = result;
+            if (!selectedSubraddit) {
+                response.status(404).send('404 WHERE AM I !?!.')
+            }
+            else {
+                myRaddit.getAllPosts({
+                        subradditId: selectedSubraddit.id
+                    })
+                    .then(function(posts) {
+                        response.render('subraddit-page', {
+                            posts: posts
+                        });
+
+                    })
+                    .catch(function(error) {
+                        response.render('error', {
+                            error: error
+                        });
+                    })
+            }
+        })
 });
 
-function loginRequired(req, res, next) {
-  if (!req.user) {
-    return res.status(401);
-  }
-  next();
-};
+// Sorted home page with 'hot' and 'top' methods
+app.get('/sort/:method', function(request, response) {
+    if (request.params.method !== 'hot' && request.params.method !== 'top') {
+        response.status(404).send('404 Not Found')
+    }
+    else {
+        myRaddit.getAllPosts({
+                sortingMethod: request.params.method
+            })
+            .then(function(posts) {
+                response.render('homepage', {
+                    posts: posts
+                })
+            })
+            .catch(function(error) {
+                response.render('error', {
+                    error: error
+                })
+            })
+    }
 
-// Error handlers
-app.use(function(req, res, next) {
-  next(createError(404));
+
 });
 
-app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
+// get single post view
 
-  res.status(err.status || 500);
-  res.render("404");
-});
-//-------------------------------------------------------------------------------
 
-var syncOptions = { force: false };
+app.get('/post/:postId', function(request, response) {
+    return Promise.all([myRaddit.getSinglePost(request.params.postId), myRaddit.getCommentsForPost(request.params.postId)]) // return a promise to retrieve the single post and its comments
+        .then(results => {
+            console.log('results', results)
+            response.render('single-post', {
+                    post: results[0],
+                    comments: results[1]
+                }) // send the results to the single-post view
+        }).catch(error => {
+            response.status(404).send('404 Not Found')
+        });
 
-// If running a test, set syncOptions.force to true
-// clearing the `testdb`
-if (process.env.NODE_ENV === "test") {
-  syncOptions.force = true;
-}
-
-// Starting the server, syncing our models ------------------------------------/
-db.sequelize.sync(syncOptions).then(function() {
-  oidc.on("ready", () => { 
-    app.listen(PORT, function() {
-      console.log(
-        "==> 🌎  Listening on port %s. Visit http://localhost:%s/ in your browser.",
-        PORT,
-        PORT
-      );
-    });
-  });
 });
 
-module.exports = app;
+
+app.post('/vote', onlyLoggedIn, function(request, response) {
+    var vote = {
+        voteDirection: request.body.voteDirection,
+        postId: request.body.postId,
+        userId: request.loggedInUser.userId
+    }
+    myRaddit.createVote(vote)
+        .then(results => {
+            response.redirect(request.get('referer'));
+
+        })
+});
+
+
+// This handler will send out an HTML form for creating a new post
+app.get('/createPost', onlyLoggedIn, function(request, response) {
+    myRaddit.getAllSubraddits()
+        .then(results => {
+            response.render('create-post-form', {
+                subradditOptions: results
+            });
+        });
+});
+
+// POST handler for form submissions creating a new post
+app.post('/createPost', onlyLoggedIn, function(request, response) {
+    myRaddit.createPost({
+            subradditId: request.body.subradditId,
+            url: request.body.url,
+            title: request.body.title,
+            userId: request.loggedInUser.userId,
+            postId: request.body.postId
+        }) // call the createPost function and pass it the information from the form
+        .then(newPostId => {
+            response.redirect(`post/${newPostId}`);
+        })
+});
+
+// GET handler for logging the user out
+app.get('/logout', function(request, response) {
+    var token = request.loggedInUser.token;
+    myRaddit.endUserSession(token)
+        .then(results => {
+            response.redirect('/');
+        });
+});
+
+// GET handler to go to specific post
+app.get('/individualPost', function(request, response) {
+    myRaddit.getAllPosts({ // get all the posts 
+                postId: request.body.postId // retrieve the post ids
+            })
+            .then(results => {
+                response.redirect(`post/${request.body.postId}`);
+            })
+});
+
+app.post('/createComment', onlyLoggedIn, function(request, response) {
+    myRaddit.createComment({
+            userId: request.loggedInUser.userId,
+            postId: request.body.postId,
+            text: request.body.text
+        }) // call the createPost function and pass it the information from the form
+        .then(results => {
+            response.redirect(`post/${request.body.postId}`);
+        })
+});
+
+
+// Listen
+var port = process.env.PORT || 3000;
+app.listen(port, function() {
+        console.log('Web server is listening on http://localhost:' + port);
+});

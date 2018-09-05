@@ -2,7 +2,7 @@
     "development": {
       "username": "root",
       "password": "berserkfury",
-      "database": "reddit",
+      "database": "raddit",
       "host": "localhost",
       "dialect": "mysql"
     }}

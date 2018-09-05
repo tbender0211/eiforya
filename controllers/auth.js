@@ -1,7 +1,7 @@
 var express = require('express');
 var loginTokenChecker = require('../lib/check-login-token.js');
 
-module.exports = function(myReddit) {
+module.exports = function(myRaddit) {
     var authController = express.Router();
     
 
@@ -11,9 +11,9 @@ module.exports = function(myReddit) {
 
 
     authController.post('/login', function(request, response) {
-        myReddit.checkUserLogin(request.body.username, request.body.password) // call the checkUserLogin function and pass it username and pwd
+        myRaddit.checkUserLogin(request.body.username, request.body.password) // call the checkUserLogin function and pass it username and pwd
             .then(result => { // if the credentials are correct, the result will contain the userId
-                return myReddit.createUserSession(result.id) // pass the userId to createUserSession function to return a new session id
+                return myRaddit.createUserSession(result.id) // pass the userId to createUserSession function to return a new session id
             })
             .then(cookie => { // set a cookie with name session where the value of the cookie is the session id
                 response.cookie('SESSION', cookie);
@@ -35,7 +35,7 @@ module.exports = function(myReddit) {
     });
 
     authController.post('/signup', function(request, response) {
-        myReddit.createUser(request.body).then(response.redirect('login'))
+        myRaddit.createUser(request.body).then(response.redirect('login'))
     });
 
     return authController;

@@ -1,0 +1,32 @@
+<div id="signup">
+
+  <h1><strong>Raddit</strong> Signup</h1>
+
+  <div>
+    <p>
+        Please create a unique username and password for your account.
+    </p>
+  </div>
+
+  <div class="signup-box">
+   <form action="/auth/signup" method='POST' class='signup-form'>
+
+     <i id='username-input-icon' class='icon-user'></i>
+     <input id="username" autocomplete="off" placeholder="Username" class='dark' type="text" name="username">
+
+     <i id='password-input-icon' class='icon-lock'></i>
+     <input id="password" autocomplete="off" placeholder="Password" class='dark' type="password" name="password">
+
+    <input type="submit" class='button large' value="Please, login to continue.">
+   
+   </form>
+
+  </div>
+
+    <div>
+        <p>
+        Already have an account? <a href="/login-form">Login now</a>.
+        </p>
+    </div>
+    
+</div>

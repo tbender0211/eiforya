@@ -1,0 +1,46 @@
+<a href={{this.url}} target=”_blank”>{{this.title}}</a>
+
+<p>Submitted by: 
+
+    <a href="/u/{{this.user.username}}">{{this.user.username}}</a>
+    in
+    <a href="/r/{{this.subreddit.name}}">/r/{{this.subreddit.name}}</a>
+
+    <br>
+
+    <a href="/post/{{this.id}}" class="ui secondary basic button"></a>
+
+</p>
+
+<p>Score: {{this.voteScore}} Upvotes: {{this.numUpvotes}} Downvotes: {{this.numDownvotes}}
+    
+    <form class="ui form" action="/vote" method="post">
+        
+        <div class="field">
+
+            <input type="hidden" name="postId" value={{post.id}}>
+            
+            <button class="ui button" type="submit" name="voteDirection", value="1">upvote</button>
+            
+            <button class="ui button" type="submit" name="voteDirection", value="-1">downvote</button>
+        
+        </div>
+    
+    </form>
+
+</p>
+
+<div class="showPostComments">
+
+  {{#each comments}}
+
+  <div>
+    <p> {{this.content}} </p>
+    
+    <p class="commentAuthor"> - {{this.author}} </p>
+    <form method="POST" action="/posts/{{@root.post.id}}/comments/{{this.id}}/replies" >
+      <textarea name="content" id="replyInput" placeholder="Reply to this comment"> </textarea>
+      <input type="hidden" name="userId" id="post-user-id" value={{currentUserId}} />
+      <button class="btn-flat" type="submit"> Reply </button>
+    </form>
+  </div>

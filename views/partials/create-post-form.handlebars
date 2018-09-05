@@ -1,0 +1,71 @@
+<div class="ui left aligned container">
+
+  <div class="ui raised segment">
+
+    <h1>Share a new link!</h1>
+    
+    <div class="ui form">
+
+      <div class="field">
+
+        <label>Select Thread</label>
+
+        <div class="ui selection dropdown">
+
+          <input type="hidden" name="subradditOptions">
+
+          <i class="dropdown icon"></i>
+
+          <div class="default text">Thread</div>
+
+          <div class="menu">
+
+            {{#each subraddit in subradditOptions}}
+
+              <div class="item" value={{subraddit.id}}>{{subraddit.name}}</div>
+
+            {{/each}}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="field">
+
+        <label>Title</label>
+        <input type="text" name="title" placeholder="Title">
+
+      </div>
+
+      <div class="field">
+
+        <label>URL</label>
+        <input type="text" name="url" placeholder="URL">
+
+      </div>
+
+      <button class="ui primary button" type="submit">
+
+        Create Post
+
+      </button>
+
+      <button class="ui button">
+
+        Cancel
+        
+      </button>
+
+    </div>
+  
+  </div>
+
+</div>
+
+<script>
+  $('select.dropdown')
+  .dropdown()
+;</script>
+

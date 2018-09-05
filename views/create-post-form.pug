@@ -7,9 +7,9 @@ block content
         form.formCreate(method='POST', action='/createPost')
             p
             |
-            select(name='subredditId')
-              each subreddit in subredditOptions
-                option(value=`${subreddit.id}`) #{subreddit.name}
+            select(name='subradditId')
+              each subraddit in subradditOptions
+                option(value=`${subraddit.id}`) #{subraddit.name}
             p
             | 
             input.loginField(type='text', name='url' placeholder='URL')
@@ -19,4 +19,3 @@ block content
             br
             br
             button(class="login" type="submit") Submit!
-    
