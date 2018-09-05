@@ -7,12 +7,13 @@ html, body {
  }
 
 .button {
-    background-color: rgb(38, 200, 241);
+    background-color: #000;
     border-color: rgb(6, 36, 170);
     border-radius: 7px;
     border: 1px solid;
     padding: 10px 15px 10px 15px;
     font-size: 11px;
+    color: #fff;
     
 }
 
@@ -33,13 +34,12 @@ header {
 }
 
 #webhead {
-    background-color: grey;
-    background-image: url("/static/images/congruent_pentagon.png");
-    background-repeat: repeat;
+    background-image: linear-gradient(to top, #30cfd0 0%, #330867 100%);
     height: 270px;
     width: 100%;
     margin-top: -18px;
     padding-top: 20px;
+    border-bottom: 2px, black;
 }
 
 h1 {
@@ -131,7 +131,6 @@ button.login {
 	font-size:17px;
     padding: 8px 21px;
 	text-decoration:none;
-	text-shadow:0px 1px 0px #000000;
 }
 button.login:hover {
 	background-color:#8c8f8c;
@@ -143,21 +142,21 @@ button.login:active {
 
 .btn-extra {
     text-decoration: none;
-    color: #000;
+    color: #fff;
     left: 100px;
 }
 
 .extra {
     position: relative;
     text-decoration: none;
-    color: #000;
+    color: #fff;
     left: 100px;
 }
 
 .extra2 {
     position: relative;
     text-decoration: none;
-    color: #000;
+    color: #FFF;
     left: 100px;
 }
 
