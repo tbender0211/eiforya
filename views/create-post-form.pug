@@ -1,0 +1,22 @@
+extends layout.pug
+
+block content
+  div.createPg
+    div(id="logBoxCreate")
+      h1(id="logH1") Share a new link!
+        form.formCreate(method='POST', action='/createPost')
+            p
+            |
+            select(name='subredditId')
+              each subreddit in subredditOptions
+                option(value=`${subreddit.id}`) #{subreddit.name}
+            p
+            | 
+            input.loginField(type='text', name='url' placeholder='URL')
+            p
+            |  
+            input.loginField(type='text', name='title' placeholder='Title')
+            br
+            br
+            button(class="login" type="submit") Submit!
+    

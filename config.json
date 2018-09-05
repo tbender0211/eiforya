@@ -1,0 +1,8 @@
+{
+    "development": {
+      "username": "root",
+      "password": "berserkfury",
+      "database": "reddit",
+      "host": "localhost",
+      "dialect": "mysql"
+    }}

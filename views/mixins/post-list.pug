@@ -1,0 +1,20 @@
+mixin postList(posts)
+    ul.post-list
+        each post in posts
+            h2.post
+                div(class= "all-posts")
+                    a(href=post.url, class="link", target="_blank") !{post.title}
+                    .submitted-area
+                        p Submitted by&nbsp;
+                            a(href="/u/" + post.user.username)= post.user.username
+                            span  in&nbsp;
+                            a(href="/r/" + post.subreddit.name) /r/#{post.subreddit.name}
+                            br
+                            a(href=`/post/${post.id}`)
+                             button(type="button" class="post-btn") see full post
+                        p Score: #{post.voteScore} Upvotes: #{post.numUpvotes} Downvotes: #{post.numDownvotes}
+                            form(action='/vote', method='post')
+                              input(type='hidden', name='postId', value=`${post.id}`)
+                              button(class="button" type='submit', name='voteDirection', value='1') upvote
+                              |&nbsp;&nbsp;
+                              button(class="button" type='submit', name='voteDirection', value='-1') downvote

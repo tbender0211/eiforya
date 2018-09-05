@@ -1,0 +1,16 @@
+extends layout.pug
+include mixins/post-list
+include mixins/header
+
+
+block title
+    div(id="webhead")
+        +headerMixin(loggedInUser)
+        title Raddit: the front page of the DANKnet
+        .logo
+            img.logoHome(src='/static/images/shaka_ws.png')
+        h1 Welcome to Raddit!
+    
+    
+    block content
+    +postList(posts)

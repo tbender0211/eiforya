@@ -1,0 +1,15 @@
+extends layout.pug
+
+block content
+  div.signPg
+    div(id="logBox")
+      h1(id="logH1") Sign Up
+       form(action='/auth/signup', method='POST')
+        p
+          | 
+          input.loginField(type='text', name='username')
+        p
+          |
+          input.loginField(type='password', name='password')
+        p
+          button(class="login" type='submit') Sign Up

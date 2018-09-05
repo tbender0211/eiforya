@@ -1,0 +1,37 @@
+extends layout.pug
+include mixins/header
+
+block title
+    div(id="webhead")
+            +headerMixin(loggedInUser)
+            title Raddit: the front page of the DANKnet
+            .logo
+                img.logoHome(src='/static/images/shaka_w.png')
+            h1 Welcome to Raddit!
+    
+block content
+        ul.post-list
+                li.post
+                    h2
+                        a(href=post.url, class="link" target="_blank") !{post.title}
+                        .submitted-area
+                            p Submitted by&nbsp;
+                                a(href="/u/" + post.user.username)= post.user.username
+                                span  in&nbsp;
+                                a(href="/r/" + post.subreddit.name) /r/#{post.subreddit.name}
+                            p Score: #{post.voteScore} Upvotes: #{post.numUpvotes} Downvotes: #{post.numDownvotes}
+                            form(method='POST', action='/createComment')
+                                input(type='hidden', name='postId', value=post.id)
+                                p
+                                | Add a comment:
+                                br
+                                textarea(type='text', name='text', class ="comment-form")
+                                br
+                                br
+                                button(class="button" type="text") Submit!
+                            .comments
+                                each comment in comments
+                                 p !{comment.text} 
+                                 span(style='font-style:italic')
+                                    span(style='font-weight:bold') submitted by #{comment.user.username} on #{comment.createdAt}
+                                    
