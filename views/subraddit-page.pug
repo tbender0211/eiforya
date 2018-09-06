@@ -12,9 +12,6 @@ block title
     
 block content
     +postList(posts)
-    ul.post-list
-        each post in posts
-            li.post
                 h2 
                     a(href=post.url, target="_blank")= post.title
                     p Submitted by&nbsp;
